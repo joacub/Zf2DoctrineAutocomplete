@@ -9,6 +9,7 @@ namespace Zf2DoctrineAutocomplete\Controller;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\JsonModel;
 use Zend\Form\Factory;
+use Nette\Diagnostics\Debugger;
 
 class SearchController extends AbstractActionController {
 
@@ -20,17 +21,33 @@ class SearchController extends AbstractActionController {
     public function searchAction() {
         $elementName = $this->params()->fromRoute('element');
         $elementName = str_replace('-', '\\', $elementName);
+        
+        $form = $this->params()->fromQuery('form');
+        $form = str_replace('-', '\\', $form);
+        
+        if($form) {
+            $form = $this->getServiceLocator()
+            ->get('FormElementManager')
+            ->get($form);
+            
+            $elementName = $this->params()->fromQuery('name');
+            $element = $form->get($elementName);
+        } else {
+            $factory = new Factory();
+            $element = $factory->createElement(array(
+                'type' => $elementName,
+                'options' => array(
+                    'sm' => $this->getServiceLocator()
+                )
+            ));
+        }
+        
 
         $term = $this->params()->fromQuery('term', '');
 
-        $factory = new Factory();
-        $element = $factory->createElement(array(
-            'type' => $elementName,
-            'options' => array(
-                'sm' => $this->getServiceLocator()
-            )
-        ));
+        
         $options = $element->getOptions();
+        
         $this->setOm($options['object_manager']);
         $proxy = $element->getProxy();
         $this->setProxy($proxy);
@@ -65,6 +82,28 @@ class SearchController extends AbstractActionController {
                 $qb->sort($options['orderBy'][0], $options['orderBy'][1]);
             }
         }
+        
+        if ($options['find_method']) {
+            if ($driver == 'orm') {
+                $findMethod = $options['find_method'];
+                
+                if (!isset($findMethod['name'])) {
+                    throw new \RuntimeException('No method name was set');
+                }
+                $findMethodName   = $findMethod['name'];
+                $findMethodParams = isset($findMethod['params']) ? array_change_key_case($findMethod['params']) : array();
+                
+                $iParam = 0;
+                foreach($findMethodParams['criteria'] as $name => $value) {
+                    $iParam++;
+                    $qb->andWhere('q.' . $name . '=' . $value);
+                }
+                
+            } elseif ($driver == 'odm') {
+//                 $qb->sort($options['orderBy'][0], $options['orderBy'][1]);
+            }
+        }
+        
         $this->setObjects($qb->getQuery()->execute());
         $valueOptions = $this->getValueOptions();
 
