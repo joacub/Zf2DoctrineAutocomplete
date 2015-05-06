@@ -83,7 +83,7 @@ class SearchController extends AbstractActionController {
             }
         }
         
-        if ($options['find_method']) {
+        if (isset($options['find_method'])) {
             if ($driver == 'orm') {
                 $findMethod = $options['find_method'];
                 
@@ -96,7 +96,11 @@ class SearchController extends AbstractActionController {
                 $iParam = 0;
                 foreach($findMethodParams['criteria'] as $name => $value) {
                     $iParam++;
-                    $qb->andWhere('q.' . $name . '=' . $value);
+                    if(is_array($value)) {
+                        $qb->andWhere('q.' . $name . ' IN(' . implode(',', $value) . ')');
+                    } else {
+                        $qb->andWhere('q.' . $name . '=' . $value);
+                    }
                 }
                 
             } elseif ($driver == 'odm') {
