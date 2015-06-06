@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @author fabio <paiva.fabiofelipe@gmail.com> 
+ * @author fabio <paiva.fabiofelipe@gmail.com>
  */
 
 namespace Zf2DoctrineAutocomplete\Controller;
@@ -21,15 +21,15 @@ class SearchController extends AbstractActionController {
     public function searchAction() {
         $elementName = $this->params()->fromRoute('element');
         $elementName = str_replace('-', '\\', $elementName);
-        
+
         $form = $this->params()->fromQuery('form');
         $form = str_replace('-', '\\', $form);
-        
+
         if($form) {
             $form = $this->getServiceLocator()
-            ->get('FormElementManager')
-            ->get($form);
-            
+                ->get('FormElementManager')
+                ->get($form);
+
             $elementName = $this->params()->fromQuery('name');
             $element = $form->get($elementName);
         } else {
@@ -41,20 +41,20 @@ class SearchController extends AbstractActionController {
                 )
             ));
         }
-        
+
 
         $term = $this->params()->fromQuery('term', '');
 
-        
+
         $options = $element->getOptions();
-        
+
         $this->setOm($options['object_manager']);
         $proxy = $element->getProxy();
         $this->setProxy($proxy);
         $this->setOptions($options);
 
         $qb = $proxy->getObjectManager()->getRepository($proxy->getTargetClass())
-                ->createQueryBuilder('q');
+            ->createQueryBuilder('q');
         $driver = '';
         if (class_exists("\Doctrine\ORM\QueryBuilder") && $qb instanceof \Doctrine\ORM\QueryBuilder) {
             /* @var $qb \Doctrine\ORM\QueryBuilder */
@@ -82,32 +82,28 @@ class SearchController extends AbstractActionController {
                 $qb->sort($options['orderBy'][0], $options['orderBy'][1]);
             }
         }
-        
-        if (isset($options['find_method'])) {
+
+        if (isset($options['find_method']) && $options['find_method']) {
             if ($driver == 'orm') {
                 $findMethod = $options['find_method'];
-                
+
                 if (!isset($findMethod['name'])) {
                     throw new \RuntimeException('No method name was set');
                 }
                 $findMethodName   = $findMethod['name'];
                 $findMethodParams = isset($findMethod['params']) ? array_change_key_case($findMethod['params']) : array();
-                
+
                 $iParam = 0;
                 foreach($findMethodParams['criteria'] as $name => $value) {
                     $iParam++;
-                    if(is_array($value)) {
-                        $qb->andWhere('q.' . $name . ' IN(' . implode(',', $value) . ')');
-                    } else {
-                        $qb->andWhere('q.' . $name . '=' . $value);
-                    }
+                    $qb->andWhere('q.' . $name . '=' . $value);
                 }
-                
+
             } elseif ($driver == 'odm') {
 //                 $qb->sort($options['orderBy'][0], $options['orderBy'][1]);
             }
         }
-        
+
         $this->setObjects($qb->getQuery()->execute());
         $valueOptions = $this->getValueOptions();
 
@@ -135,16 +131,16 @@ class SearchController extends AbstractActionController {
                 } elseif ($property = $proxy->getProperty()) {
                     if ($proxy->getIsMethod() == false && !$metadata->hasField($property)) {
                         throw new RuntimeException(
-                        sprintf(
+                            sprintf(
                                 'Property "%s" could not be found in object "%s"', $property, $targetClass
-                        )
+                            )
                         );
                     }
 
                     $getter = 'get' . ucfirst($property);
                     if (!is_callable(array($object, $getter))) {
                         throw new RuntimeException(
-                        sprintf('Method "%s::%s" is not callable', $proxy->getTargetClass(), $getter)
+                            sprintf('Method "%s::%s" is not callable', $proxy->getTargetClass(), $getter)
                         );
                     }
 
@@ -152,10 +148,10 @@ class SearchController extends AbstractActionController {
                 } else {
                     if (!is_callable(array($object, '__toString'))) {
                         throw new RuntimeException(
-                        sprintf(
+                            sprintf(
                                 '%s must have a "__toString()" method defined if you have not set a property'
                                 . ' or method to use.', $targetClass
-                        )
+                            )
                         );
                     }
 
