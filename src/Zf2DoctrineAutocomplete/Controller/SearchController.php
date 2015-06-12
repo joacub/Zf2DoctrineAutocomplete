@@ -43,7 +43,7 @@ class SearchController extends AbstractActionController {
         }
 
 
-        $term = mb_strtolower($this->params()->fromQuery('term', ''));
+        $term = $this->params()->fromQuery('term', '');
 
 
         $options = $element->getOptions();
