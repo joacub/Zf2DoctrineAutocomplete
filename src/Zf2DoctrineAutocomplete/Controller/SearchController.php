@@ -129,7 +129,10 @@ class SearchController extends AbstractActionController {
                 if (isset($entityOptions['label_generator']) && is_callable($entityOptions['label_generator']) && null !== ($generatedLabel = call_user_func($entityOptions['label_generator'], $object))) {
                     $label = $generatedLabel;
                 } elseif ($property = $proxy->getProperty()) {
-                    if ($proxy->getIsMethod() == false && !$metadata->hasField($property)) {
+
+                    $getter = 'get' . ucfirst($property);
+
+                    if ($proxy->getIsMethod() == false && !$metadata->hasField($property) && !is_callable(array($object, $getter))) {
                         throw new RuntimeException(
                             sprintf(
                                 'Property "%s" could not be found in object "%s"', $property, $targetClass
@@ -137,7 +140,6 @@ class SearchController extends AbstractActionController {
                         );
                     }
 
-                    $getter = 'get' . ucfirst($property);
                     if (!is_callable(array($object, $getter))) {
                         throw new RuntimeException(
                             sprintf('Method "%s::%s" is not callable', $proxy->getTargetClass(), $getter)
