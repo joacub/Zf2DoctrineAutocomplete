@@ -7,13 +7,11 @@
 namespace Zf2DoctrineAutocomplete\Controller;
 
 use Doctrine\ORM\EntityManager;
-use DoctrineModule\Stdlib\Hydrator\DoctrineObject;
 use Zend\Form\Element\Collection;
 use Zend\Form\InputFilterProviderFieldset;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\JsonModel;
 use Zend\Form\Factory;
-use Nette\Diagnostics\Debugger;
 
 class SearchController extends AbstractActionController {
 
