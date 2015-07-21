@@ -11,7 +11,6 @@ use DoctrineModule\Stdlib\Hydrator\DoctrineObject;
 use Zend\Form\Element\Collection;
 use Zend\Form\InputFilterProviderFieldset;
 use Zend\Mvc\Controller\AbstractActionController;
-use Zend\Stdlib\PriorityQueue;
 use Zend\View\Model\JsonModel;
 use Zend\Form\Factory;
 use Nette\Diagnostics\Debugger;
@@ -71,6 +70,11 @@ class SearchController extends AbstractActionController {
 
         $this->setOm($options['object_manager']);
         $proxy = $element->getProxy();
+
+        if($proxy->getFindMethod()) {
+            $options['find_method'] = $proxy->getFindMethod();
+        }
+
         $this->setProxy($proxy);
         $targetClass = $proxy->getTargetClass();
 
