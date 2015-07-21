@@ -6,7 +6,12 @@
 
 namespace Zf2DoctrineAutocomplete\Controller;
 
+use Doctrine\ORM\EntityManager;
+use DoctrineModule\Stdlib\Hydrator\DoctrineObject;
+use Zend\Form\Element\Collection;
+use Zend\Form\InputFilterProviderFieldset;
 use Zend\Mvc\Controller\AbstractActionController;
+use Zend\Stdlib\PriorityQueue;
 use Zend\View\Model\JsonModel;
 use Zend\Form\Factory;
 use Nette\Diagnostics\Debugger;
@@ -31,7 +36,15 @@ class SearchController extends AbstractActionController {
                 ->get($form);
 
             $elementName = $this->params()->fromQuery('name');
-            $element = $form->get($elementName);
+
+            if($form->has($elementName)) {
+                $element = $form->get($elementName);
+            } else {
+                $elementNameParts = explode('[', $elementName);
+                $elementNameSimple = current($elementNameParts);
+                $element = $form->get($elementNameSimple);
+            }
+
         } else {
             $factory = new Factory();
             $element = $factory->createElement(array(
@@ -45,15 +58,25 @@ class SearchController extends AbstractActionController {
 
         $term = mb_strtolower($this->params()->fromQuery('term', ''));
 
+        if($element instanceof Collection) {
+            $elementName = str_replace(']', '', $elementNameParts[2]);
+            $targetElementFieldset = $element->getTargetElement();
+            /**
+             * @var $targetElementFieldset InputFilterProviderFieldset
+             */
+            $element = $targetElementFieldset->get($elementName);
+        }
 
         $options = $element->getOptions();
 
         $this->setOm($options['object_manager']);
         $proxy = $element->getProxy();
         $this->setProxy($proxy);
+        $targetClass = $proxy->getTargetClass();
+
         $this->setOptions($options);
 
-        $qb = $proxy->getObjectManager()->getRepository($proxy->getTargetClass())
+        $qb = $this->getOm()->getRepository($targetClass)
             ->createQueryBuilder('q');
         $driver = '';
         if (class_exists("\Doctrine\ORM\QueryBuilder") && $qb instanceof \Doctrine\ORM\QueryBuilder) {
@@ -191,6 +214,9 @@ class SearchController extends AbstractActionController {
         return $this;
     }
 
+    /**
+     * @return EntityManager
+     */
     public function getOm() {
         return $this->om;
     }
