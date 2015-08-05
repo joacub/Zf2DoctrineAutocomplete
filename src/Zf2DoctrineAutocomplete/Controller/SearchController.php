@@ -67,6 +67,7 @@ class SearchController extends AbstractActionController {
 
         $options = $element->getOptions();
 
+        Debugger::$productionMode = false;
         Debugger::dump($options);
         exit;
 
