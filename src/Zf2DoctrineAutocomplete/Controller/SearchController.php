@@ -7,6 +7,7 @@
 namespace Zf2DoctrineAutocomplete\Controller;
 
 use Doctrine\ORM\EntityManager;
+use Nette\Diagnostics\Debugger;
 use Zend\Form\Element\Collection;
 use Zend\Form\InputFilterProviderFieldset;
 use Zend\Mvc\Controller\AbstractActionController;
@@ -26,6 +27,10 @@ class SearchController extends AbstractActionController {
 
         $form = $this->params()->fromQuery('form');
         $form = str_replace('-', '\\', $form);
+
+        Debugger::$productionMode = false;
+        Debugger::dump($_GET);
+        exit;
 
         if($form) {
             $form = $this->getServiceLocator()
@@ -65,6 +70,10 @@ class SearchController extends AbstractActionController {
         }
 
         $options = $element->getOptions();
+
+        Debugger::$productionMode = false;
+        Debugger::dump($options);
+        exit;
 
         $this->setOm($options['object_manager']);
         $proxy = $element->getProxy();
