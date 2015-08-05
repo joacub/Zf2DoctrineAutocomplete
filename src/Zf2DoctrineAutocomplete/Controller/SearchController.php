@@ -68,6 +68,7 @@ class SearchController extends AbstractActionController {
         $options = $element->getOptions();
 
         Debugger::dump($options);
+        exit;
 
         $this->setOm($options['object_manager']);
         $proxy = $element->getProxy();
