@@ -28,6 +28,8 @@ class SearchController extends AbstractActionController {
         $form = $this->params()->fromQuery('form');
         $form = str_replace('-', '\\', $form);
 
+        var_dump($form);Exit;
+
         if($form) {
             $form = $this->getServiceLocator()
                 ->get('FormElementManager')
