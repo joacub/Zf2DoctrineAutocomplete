@@ -7,6 +7,7 @@
 namespace Zf2DoctrineAutocomplete\Controller;
 
 use Doctrine\ORM\EntityManager;
+use Nette\Diagnostics\Debugger;
 use Zend\Form\Element\Collection;
 use Zend\Form\InputFilterProviderFieldset;
 use Zend\Mvc\Controller\AbstractActionController;
@@ -65,6 +66,8 @@ class SearchController extends AbstractActionController {
         }
 
         $options = $element->getOptions();
+
+        Debugger::dump($options);
 
         $this->setOm($options['object_manager']);
         $proxy = $element->getProxy();
