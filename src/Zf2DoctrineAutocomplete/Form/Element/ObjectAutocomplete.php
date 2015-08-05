@@ -98,6 +98,7 @@ class ObjectAutocomplete extends Text
     public function setOptions($options)
     {
         if (! $this->initialized) {
+            throw new \Exception('asd');
             $this->setAttribute('data-zf2doctrineacclass', urlencode(str_replace('\\', '-', $options['class'])));
             $this->setAttribute('data-zf2doctrineacform', urlencode(str_replace('\\', '-', $options['form'])));
             $this->setAttribute('data-zf2doctrineacproperty', $options['property']);
