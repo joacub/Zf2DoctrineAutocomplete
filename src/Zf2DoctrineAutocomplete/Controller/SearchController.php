@@ -29,7 +29,7 @@ class SearchController extends AbstractActionController {
         $form = str_replace('-', '\\', $form);
 
         Debugger::$productionMode = false;
-        Debugger::dump($_GET);
+        Debugger::dump($_SERVER);
         exit;
 
         if($form) {
