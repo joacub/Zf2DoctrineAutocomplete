@@ -28,7 +28,9 @@ class SearchController extends AbstractActionController {
         $form = $this->params()->fromQuery('form');
         $form = str_replace('-', '\\', $form);
 
-        var_dump($form);Exit;
+        Debugger::$productionMode = false;
+        Debugger::dump($this->params()->fromQuery());
+        exit;
 
         if($form) {
             $form = $this->getServiceLocator()
