@@ -16,7 +16,7 @@
     ],
     "require": {
         "php": ">=5.3.3",
-	"doctrine/doctrine-module": ">=0.8"
+	"joacub/doctrine-module": ">=0.8"
     },
     "autoload": {
         "psr-0": {
